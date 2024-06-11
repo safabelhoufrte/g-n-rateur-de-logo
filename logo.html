@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Choix du Logo</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .logo-container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .logo-gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 150px; }
+        .logo-item { display: flex; align-items: center; justify-content: center; margin: 10px; } /* Centrer le contenu de chaque logo */
+        .logo-item img { width: 100px; height: 100px; }
+        .logo-item span { margin-top: 5px; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group select { width: 100%; padding: 8px; }
+        .form-group button { padding: 10px 20px; background-color: #007BFF; color: #FFF; border: none; cursor: pointer; }
+    </style>
+    <link rel="stylesheet" href="logo.css">
+</head>
+<body>
+    <div class="logo-container">
+        <h1>Choix du Logo</h1>
+        <form id="logoForm">
+            <div class="form-group">
+                <label for="iconPosition">Position de l'icône</label>
+                <select id="iconPosition" name="iconPosition" required>
+                    <option value="top">En haut</option>
+                    <option value="bottom">En bas</option>
+                    <option value="left">À gauche</option>
+                    <option value="right">À droite</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="fontFamily">Police de caractères</label>
+                <select id="fontFamily" name="fontFamily" required>
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="Verdana, sans-serif">Verdana</option>
+                    <option value="Times New Roman, serif">Times New Roman</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="Courier New, monospace">Courier New</option>
+                    <option value="Lucida Console, monospace">Lucida Console</option>
+                    <option value="Tahoma, sans-serif">Tahoma</option>
+                    <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
+                    <option value="Impact, sans-serif">Impact</option>
+                    <option value="Comic Sans MS, cursive">Comic Sans MS</option>
+                    <option value="Brush Script MT, cursive">Brush Script MT</option>
+                    <option value="Palatino Linotype, serif">Palatino Linotype</option>
+                    <option value="Garamond, serif">Garamond</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit">Générer Logo</button>
+            </div>
+        </form>
+        <div class="logo-gallery" id="logoGallery">
+            <!-- Les logos seront générés ici -->
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const companyData = JSON.parse(localStorage.getItem('companyData'));
+            const logoGallery = document.getElementById('logoGallery');
+            const iconPositionSelect = document.getElementById('iconPosition');
+            const fontFamilySelect = document.getElementById('fontFamily');
+
+            // Lire le secteur d'activité depuis l'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const sector = urlParams.get('sector');
+            const sectorFolder = sector.toLowerCase().replace(/ /g, '-'); // Convertir en minuscule et remplacer les espaces par des tirets pour correspondre aux noms des dossiers
+
+            document.getElementById('logoForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                generateLogoGallery(iconPositionSelect.value, fontFamilySelect.value, sectorFolder);
+            });
+
+            function generateLogoGallery(position, fontFamily, folder) {
+                logoGallery.innerHTML = ''; // Effacer les logos précédents
+                for (let i = 1; i <= 20; i++) {
+                    const logoItem = document.createElement('div');
+                    logoItem.className = 'logo-item';
+                    logoItem.style.flexDirection = getFlexDirection(position);
+
+                    const logoImg = document.createElement('img');
+                    logoImg.src = `images/${folder}/tech${i}.png`;
+                    logoImg.alt = `Logo ${i}`;
+
+                    const companyNameSpan = document.createElement('span');
+                    companyNameSpan.textContent = companyData.companyName;
+                    companyNameSpan.style.fontFamily = fontFamily; // Appliquer la police de caractères choisie
+
+                    const downloadButton = document.createElement('button');
+                    downloadButton.className = 'download-button';
+                    downloadButton.textContent = 'Télécharger';
+                    downloadButton.addEventListener('click', function() {
+                        const link = document.createElement('a');
+                        link.href = logoImg.src;
+                        link.download = `Logo_${i}.png`;
+                        link.click();
+                    });
+                    logoItem.appendChild(logoImg);
+                    logoItem.appendChild(companyNameSpan);
+                    logoItem.appendChild(downloadButton);
+
+                    logoGallery.appendChild(logoItem);
+                }
+            }
+
+            function getFlexDirection(position) {
+                switch (position) {
+                    case 'top': return 'column';
+                    case 'bottom': return 'column-reverse';
+                    case 'left': return 'row';
+                    case 'right': return 'row-reverse';
+                    default: return 'row'; // Valeur par défaut
+                }
+            }
+        });
+    </script>
+</body>
+</html>
